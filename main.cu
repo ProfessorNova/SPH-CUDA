@@ -23,15 +23,15 @@
 //--------------------------------------------------------------------------------------
 // Simulation Hyperparameters and Domain (simulation units)
 //--------------------------------------------------------------------------------------
-constexpr int N = 2000; // Number of particles
+constexpr int N = 1000; // Number of particles
 constexpr float DIM_SIZE_X = 40.0f; // Domain size in x (simulation units)
 constexpr float DIM_SIZE_Y = 20.0f; // Domain size in y (simulation units)
 constexpr float SCALE = 50.0f; // Scale factor: simulation units -> pixels
 constexpr float H = 1.0f; // Smoothing radius
-constexpr float K = 3000.0f; // Gas constant (stiffness)
-constexpr float RHO0 = 5.0f; // Rest density
+constexpr float K = 5000.0f; // Gas constant (stiffness)
+constexpr float RHO0 = 3.0f; // Rest density
 constexpr float MU = 10.0f; // Viscosity coefficient
-constexpr float GRAVITY = 100.0f; // Gravity constant (applied in positive y direction)
+constexpr float GRAVITY = 50.0f; // Gravity constant (applied in positive y direction)
 constexpr float ANIMATION_FPS = 60.0f; // Animation frames per second
 constexpr float DT = 0.005f; // Time step for integration
 constexpr float BOUND_RADIUS = 0.05f; // Minimal allowed position from boundaries
@@ -184,7 +184,7 @@ __global__ void applyMouseForce(Particle *particles, const int N, const float2 m
         direction.y = mousePos.y - particles[i].position.y;
         // Only apply force if within the interaction radius
         if (const float distance = lengthF2(direction); distance < interactionRadius) {
-            if (distance > interactionRadius * 0.7f or strength < 0.0f) {
+            if (distance > interactionRadius * 0.8f or strength < 0.0f) {
                 constexpr float epsilon = 0.01f;
                 // Normalize the direction vector
                 direction.x /= distance;
@@ -481,7 +481,7 @@ int main() {
             const float speed = lengthF2(particles[i].velocity);
             // Use 10.0f as a reference maximum speed for color mapping.
             const Color col = getVelocityColor(speed, 10.0f);
-            DrawCircle(static_cast<int>(screenX), static_cast<int>(screenY), 0.05f * SCALE, col);
+            DrawCircle(static_cast<int>(screenX), static_cast<int>(screenY), 0.1f * SCALE, col);
         }
         const double totalEndTime = GetTime();
         const double totalTime = totalEndTime - totalStartTime;
