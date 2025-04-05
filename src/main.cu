@@ -180,6 +180,7 @@ int main() {
         DrawText(TextFormat("Theoretical Max FPS: %.2f", theoreticalMaxFPS), 10, 50, 20, WHITE);
         DrawText(TextFormat("Target FPS: %.0f", ANIMATION_FPS), 10, 70, 20, WHITE);
         DrawText(TextFormat("Current FPS: %d", GetFPS()), 10, 90, 20, WHITE);
+        DrawText("Controls: LMB to push, RMB to swirl", 10, 130, 20, WHITE);
 
         EndDrawing();
     }
