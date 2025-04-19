@@ -9,14 +9,14 @@ simulation to scale to thousands of particles.
 - Overview
 - Project Structure
 - Components
-    - config.h
-    - grid.h
-    - kernels.h
-    - particle.h
-    - renderer.h
-    - main.cu
-    - kernels.cu
-    - renderer.cu
+  - config.h
+  - grid.h
+  - kernels.h
+  - particle.h
+  - renderer.h
+  - main.cu
+  - kernels.cu
+  - renderer.cu
 - How the Components Interact
 - Build and Run Instructions
 - Future Improvements
@@ -101,8 +101,8 @@ The entry point of the simulation. It:
 2. Allocates memory for particles and grid data
 3. Randomizes initial particle positions
 4. Runs the main loop:
-    - Updates physics by launching CUDA kernels
-    - Renders the particles with raylib
+   - Updates physics by launching CUDA kernels
+   - Renders the particles with raylib
 5. Cleans up and closes the window on exit
 
 ### kernels.cu
@@ -123,29 +123,33 @@ particles and are called from the main loop to draw particles each frame.
 ## How the Components Interact
 
 1. **Initialization**:
-    - `main.cu` sets up the window and allocates memory.
-    - Particles are randomly distributed in the simulation space.
+
+   - `main.cu` sets up the window and allocates memory.
+   - Particles are randomly distributed in the simulation space.
 
 2. **Physics**:
-    - `main.cu` launches kernels from `kernels.cu` to update the grid, compute density/pressure, and integrate
-      positions.
-    - `grid.h` helper functions are used in kernels to find neighboring cells efficiently.
+
+   - `main.cu` launches kernels from `kernels.cu` to update the grid, compute density/pressure, and integrate
+     positions.
+   - `grid.h` helper functions are used in kernels to find neighboring cells efficiently.
 
 3. **Rendering**:
-    - After the physics update, `renderer.cu` functions are called to draw each particle with a color based on its
-      velocity.
+
+   - After the physics update, `renderer.cu` functions are called to draw each particle with a color based on its
+     velocity.
 
 4. **Interaction**:
-    - Mouse input is processed by specific kernels in `kernels.cu` (push or swirl forces).
-    - Boundary conditions prevent particles from leaving the domain.
+   - Mouse input is processed by specific kernels in `kernels.cu` (push or swirl forces).
+   - Boundary conditions prevent particles from leaving the domain.
 
 ## Build and Run Instructions
 
 ### Prerequisites
 
-- A CUDA-capable GPU
+- A CUDA-capable GPU with the NVIDIA driver installed.
+- NVIDIA CUDA Toolkit (tested with 12.8)
 - CMake (3.30 or higher)
-- raylib and OpenGL development libraries
+- Build tools (e.g., Visual Studio, GCC, etc.)
 
 ### Steps
 
@@ -156,7 +160,7 @@ particles and are called from the main loop to draw particles each frame.
 3. Build the project:  
    cmake --build .
 4. Run the generated executable:  
-   ./SPH_CUDA
+   .\Debug\SPH_CUDA
 
 ## Future Improvements
 
