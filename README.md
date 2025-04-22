@@ -1,8 +1,6 @@
 # SPH-CUDA: A Smoothed Particle Hydrodynamics Simulation
 
-This project implements a simplified Smoothed Particle Hydrodynamics (SPH) simulation using CUDA for parallel
-computation and raylib for real-time visualization. It uses a uniform grid to speed up neighbor searches, allowing the
-simulation to scale to thousands of particles.
+This project implements a simplified Smoothed Particle Hydrodynamics (SPH) simulation using CUDA for parallel computation and raylib for real-time visualization. It uses a uniform grid to speed up neighbor searches, allowing the simulation to scale to thousands of particles.
 
 ## Result
 
@@ -55,7 +53,10 @@ SPH-CUDA
 
 This section explains how to set up the CUDA simulation as well as the jupyter notebook.
 
-### Setup for CUDA
+### Setup for CUDA implementation
+
+The project containes a CMakeLists.txt file for easy building. The project is designed to be built with CMake, which will handle the.
+The setup is designed for Windows, but it should work on Linux and MacOS with minor modifications.
 
 #### Prerequisites
 
@@ -83,14 +84,52 @@ This section explains how to set up the CUDA simulation as well as the jupyter n
 4. Run the generated executable:
 
    ```bash
-   .\Debug\SPH_CUDA
+   .\Debug\SPH_CUDA.exe
    ```
 
-#### Setup for Jupyter Notebook
+### Setup for Jupyter Notebook
 
 1. Go into the `python` directory.
 
-## Components
+   ```bash
+   cd python
+   ```
+
+2. Create a virtual environment (optional but recommended):
+
+   ```bash
+   python -m venv venv
+   ```
+
+3. Activate the virtual environment:
+
+   - On Windows:
+
+     ```bash
+     venv\Scripts\activate
+     ```
+
+   - On Linux/MacOS:
+
+     ```bash
+     source venv/bin/activate
+     ```
+
+4. Install the required packages:
+
+   ```bash
+   pip install -r req.txt
+   ```
+
+5. Launch Jupyter Notebook:
+
+   ```bash
+   jupyter notebook
+   ```
+
+6. Open the `particle-based_fluid.ipynb` notebook to explore the SPH algorithm and its implementation.
+
+## Components of CUDA implementation
 
 This section describes the main components of the CUDA simulation and how they interact.
 
@@ -101,8 +140,7 @@ constants in a single file makes them easy to manage.
 
 ### grid.h
 
-Contains inline helper functions for converting particle positions to grid coordinates, retrieving neighboring cell
-indices, and more. These functions are used by the CUDA kernels to organize particles in a grid for faster neighbor
+Contains inline helper functions for converting particle positions to grid coordinates, retrieving neighboring cell indices, and more. These functions are used by the CUDA kernels to organize particles in a grid for faster neighbor
 searches.
 
 ### kernels.h
@@ -159,8 +197,7 @@ Implements the CUDA kernels declared in kernels.h. These kernels run in parallel
 
 ### renderer.cu
 
-Implements the rendering functions declared in renderer.h. These functions create textures and color gradients for
-particles and are called from the main loop to draw particles each frame.
+Implements the rendering functions declared in renderer.h. These functions create textures and color gradients for particles and are called from the main loop to draw particles each frame.
 
 ## How the Components Interact
 
@@ -171,14 +208,12 @@ particles and are called from the main loop to draw particles each frame.
 
 2. **Physics**:
 
-   - `main.cu` launches kernels from `kernels.cu` to update the grid, compute density/pressure, and integrate
-     positions.
+   - `main.cu` launches kernels from `kernels.cu` to update the grid, compute density/pressure, and integrate positions.
    - `grid.h` helper functions are used in kernels to find neighboring cells efficiently.
 
 3. **Rendering**:
 
-   - After the physics update, `renderer.cu` functions are called to draw each particle with a color based on its
-     velocity.
+   - After the physics update, `renderer.cu` functions are called to draw each particle with a color based on its velocity.
 
 4. **Interaction**:
    - Mouse input is processed by specific kernels in `kernels.cu` (push or swirl forces).
