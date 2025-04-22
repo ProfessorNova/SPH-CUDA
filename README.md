@@ -21,16 +21,16 @@ This repository is separated into two parts:
 ### Directory Structure
 
 SPH-CUDA  
-├── docs
+├── docs  
 ├── include  
 │ ├── config.h  
 │ ├── grid.h  
 │ ├── kernels.h  
 │ ├── particle.h  
 │ └── renderer.h  
-├── python
-│ ├── particle-based_fluid.ipynb
-│ └── req.txt
+├── python  
+│ ├── particle-based_fluid.ipynb  
+│ └── req.txt  
 ├── src  
 │ ├── kernels.cu  
 │ ├── main.cu  
