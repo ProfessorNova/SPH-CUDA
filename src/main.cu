@@ -51,12 +51,12 @@ int main() {
     std::uniform_real_distribution<float> dist(0.0f, 1.0f); // Uniform distribution in [0, 1)
     for (int i = 0; i < N; i++) {
         float x = dist(mt) * DIM_SIZE_X;
-        float y = dist(mt) * DIM_SIZE_Y;
+        float y = dist(mt) * DIM_SIZE_Y / 2.0f + DIM_SIZE_Y / 2.0f;
         particles[i].position = {x, y};
         particles[i].oldPosition = {x, y};
         particles[i].velocity = {0.0f, 0.0f};
         particles[i].force = {0.0f, 0.0f};
-        particles[i].mass = 1.0f;
+        particles[i].mass = PARTICLE_MASS;
         particles[i].density = 0.0f;
         particles[i].pressure = 0.0f;
     }
@@ -66,7 +66,7 @@ int main() {
     int blocks = (N + threadsPerBlock - 1) / threadsPerBlock;
 
     // Create pre-rendered particle texture.
-    RenderTexture2D particleTexture = CreateCircleTexture(0.2f * SCALE, WHITE);
+    RenderTexture2D particleTexture = CreateCircleTexture(0.03f * SCALE, WHITE);
 
     // Main simulation loop
     while (!WindowShouldClose()) {
@@ -85,8 +85,7 @@ int main() {
             cudaDeviceSynchronize();
 
             // Apply boundary conditions
-            applyBoundaryConditions<<<blocks, threadsPerBlock>>>(particles, N, DIM_SIZE_X, DIM_SIZE_Y, DAMPING,
-                                                                 BOUND_RADIUS);
+            applyBoundaryConditions<<<blocks, threadsPerBlock>>>(particles, N, DIM_SIZE_X, DIM_SIZE_Y, DAMPING, BOUND_RADIUS);
             cudaDeviceSynchronize();
 
             // Predict new positions based on current velocities
@@ -96,13 +95,11 @@ int main() {
             // Reset grid counters
             cudaMemset(gridCounters, 0, GRID_CELL_COUNT * sizeof(int));
             // Update grid: assign each particle to a grid cell
-            updateGrid<<<blocks, threadsPerBlock>>>(particles, N, GRID_CELL_SIZE, GRID_WIDTH, GRID_HEIGHT,
-                                                    gridCounters, gridCells, MAX_PARTICLES_PER_CELL);
+            updateGrid<<<blocks, threadsPerBlock>>>(particles, N, GRID_CELL_SIZE, GRID_WIDTH, GRID_HEIGHT, gridCounters, gridCells, MAX_PARTICLES_PER_CELL);
             cudaDeviceSynchronize();
 
             // Compute density using grid-based neighbor search
-            computeDensityGrid<<<blocks, threadsPerBlock>>>(particles, N, GRID_CELL_SIZE, GRID_WIDTH, GRID_HEIGHT,
-                                                            gridCounters, gridCells, MAX_PARTICLES_PER_CELL);
+            computeDensityGrid<<<blocks, threadsPerBlock>>>(particles, N, GRID_CELL_SIZE, GRID_WIDTH, GRID_HEIGHT, gridCounters, gridCells, MAX_PARTICLES_PER_CELL);
             cudaDeviceSynchronize();
 
             // Compute pressure from density
@@ -110,15 +107,11 @@ int main() {
             cudaDeviceSynchronize();
 
             // Compute pressure forces using grid-based neighbor search
-            computePressureForcesGrid<<<blocks, threadsPerBlock>>>(particles, N, GRID_CELL_SIZE, GRID_WIDTH,
-                                                                   GRID_HEIGHT, gridCounters, gridCells,
-                                                                   MAX_PARTICLES_PER_CELL);
+            computePressureForcesGrid<<<blocks, threadsPerBlock>>>(particles, N, GRID_CELL_SIZE, GRID_WIDTH, GRID_HEIGHT, gridCounters, gridCells, MAX_PARTICLES_PER_CELL);
             cudaDeviceSynchronize();
 
             // Compute viscosity forces using grid-based neighbor search
-            computeViscosityForcesGrid<<<blocks, threadsPerBlock>>>(particles, N, GRID_CELL_SIZE, GRID_WIDTH,
-                                                                    GRID_HEIGHT, gridCounters, gridCells,
-                                                                    MAX_PARTICLES_PER_CELL, MU);
+            computeViscosityForcesGrid<<<blocks, threadsPerBlock>>>(particles, N, GRID_CELL_SIZE, GRID_WIDTH, GRID_HEIGHT, gridCounters, gridCells, MAX_PARTICLES_PER_CELL, MU);
             cudaDeviceSynchronize();
 
             // Reset particle positions to saved positions for stability
@@ -129,14 +122,12 @@ int main() {
             if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
                 Vector2 mousePosRaylib = GetMousePosition();
                 float2 mousePos = {mousePosRaylib.x / SCALE, mousePosRaylib.y / SCALE};
-                applyPushForce<<<blocks, threadsPerBlock>>>(particles, N, mousePos, -MOUSE_STRENGTH,
-                                                            MOUSE_INTERACTION_RADIUS);
+                applyPushForce<<<blocks, threadsPerBlock>>>(particles, N, mousePos, -MOUSE_STRENGTH, MOUSE_INTERACTION_RADIUS);
                 cudaDeviceSynchronize();
             } else if (IsMouseButtonDown(MOUSE_RIGHT_BUTTON)) {
                 Vector2 mousePosRaylib = GetMousePosition();
                 float2 mousePos = {mousePosRaylib.x / SCALE, mousePosRaylib.y / SCALE};
-                applySwirlForce<<<blocks, threadsPerBlock>>>(particles, N, mousePos, MOUSE_STRENGTH,
-                                                             MOUSE_INTERACTION_RADIUS);
+                applySwirlForce<<<blocks, threadsPerBlock>>>(particles, N, mousePos, MOUSE_STRENGTH, MOUSE_INTERACTION_RADIUS);
                 cudaDeviceSynchronize();
             }
 
@@ -145,8 +136,7 @@ int main() {
             cudaDeviceSynchronize();
 
             // Enforce boundary conditions again after integration
-            applyBoundaryConditions<<<blocks, threadsPerBlock>>>(particles, N, DIM_SIZE_X, DIM_SIZE_Y, DAMPING,
-                                                                 BOUND_RADIUS);
+            applyBoundaryConditions<<<blocks, threadsPerBlock>>>(particles, N, DIM_SIZE_X, DIM_SIZE_Y, DAMPING, BOUND_RADIUS);
             cudaDeviceSynchronize();
 
             double endTime = GetTime();
@@ -163,11 +153,18 @@ int main() {
             int screenX = static_cast<int>(particles[i].position.x * SCALE);
             int screenY = static_cast<int>(particles[i].position.y * SCALE);
             float speed = lengthF2(particles[i].velocity);
-            Color col = getVelocityColor(speed, 25.0f);
+            Color col = getVelocityColor(speed, 10.0f);
             DrawTexture(particleTexture.texture,
                         screenX - particleTexture.texture.width / 2,
                         screenY - particleTexture.texture.height / 2,
                         col);
+        }
+
+        // Draw circle outline in red around the mouse position if clicked
+        if (IsMouseButtonDown(MOUSE_LEFT_BUTTON) || IsMouseButtonDown(MOUSE_RIGHT_BUTTON)) {
+            Vector2 mousePosRaylib = GetMousePosition();
+            float2 mousePos = {mousePosRaylib.x / SCALE, mousePosRaylib.y / SCALE};
+            DrawCircleLines(static_cast<int>(mousePos.x * SCALE), static_cast<int>(mousePos.y * SCALE), MOUSE_INTERACTION_RADIUS * SCALE, RED);
         }
 
         double renderEndTime = GetTime();

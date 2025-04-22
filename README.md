@@ -4,53 +4,95 @@ This project implements a simplified Smoothed Particle Hydrodynamics (SPH) simul
 computation and raylib for real-time visualization. It uses a uniform grid to speed up neighbor searches, allowing the
 simulation to scale to thousands of particles.
 
-## Table of Contents
+## Result
 
-- Overview
-- Project Structure
-- Components
-  - config.h
-  - grid.h
-  - kernels.h
-  - particle.h
-  - renderer.h
-  - main.cu
-  - kernels.cu
-  - renderer.cu
-- How the Components Interact
-- Build and Run Instructions
-- Future Improvements
+![preview](docs/preview.gif)
 
-## Overview
-
-SPH is a method for simulating fluid by modeling it as a set of particles. Each particle computes its density, pressure,
-and forces based on nearby particles. Using CUDA accelerates these computations by distributing them across the GPU.
-raylib handles the graphics, drawing particles at positions updated each frame.
+The simulation showcases fluid approximating properties like water.
+This simulation contains 15 000 particles and runs at consistent 60 FPS (with theoratical maximum of 90 FPS) on a RTX 3080.
+It also showcases mouse interaction, where the user can push or swirl the fluid by clicking and dragging the mouse.
+The different colors represent the velocity of the particles, with white being the fastest and blue being the slowest.
 
 ## Project Structure
 
+This repository is separated into two parts:
+
+1. The implementation of the SPH simulation using CUDA and C++ for high performance.
+2. A jupyter notebook that is designed to explain the SPH algorithm and its implementation in detail.
+
+### Directory Structure
+
 SPH-CUDA  
+├── docs
 ├── include  
 │ ├── config.h  
 │ ├── grid.h  
 │ ├── kernels.h  
 │ ├── particle.h  
 │ └── renderer.h  
+├── python
+│ ├── particle-based_fluid.ipynb
+│ └── req.txt
 ├── src  
 │ ├── kernels.cu  
 │ ├── main.cu  
 │ └── renderer.cu  
+├── .gitattributes
 ├── .gitignore  
 ├── CMakeLists.txt  
 └── README.md
 
+- **docs**: Contains images and other documentation files.
 - **include**: Holds header files for various parts of the simulation.
+- **python**: Contains a jupyter notebook that explains the SPH algorithm and its implementation in detail.
 - **src**: Contains the CUDA and C++ source files.
 - **.gitignore**: Specifies which files and folders Git should ignore.
+- **.gitattributes**: Configures Git attributes for the repository.
 - **CMakeLists.txt**: Build configuration for CMake.
 - **README.md**: This documentation.
 
+## Setup
+
+This section explains how to set up the CUDA simulation as well as the jupyter notebook.
+
+### Setup for CUDA
+
+#### Prerequisites
+
+- A CUDA-capable GPU with the NVIDIA driver installed.
+- NVIDIA CUDA Toolkit (tested with 12.8)
+- CMake (3.30 or higher)
+- Build tools (e.g., Visual Studio, GCC, etc.)
+
+#### Steps
+
+1. Clone the repository and navigate into it.
+2. Create a build directory and run CMake:
+
+   ```bash
+   mkdir build && cd build
+   cmake ..
+   ```
+
+3. Build the project:
+
+   ```bash
+   cmake --build .
+   ```
+
+4. Run the generated executable:
+
+   ```bash
+   .\Debug\SPH_CUDA
+   ```
+
+#### Setup for Jupyter Notebook
+
+1. Go into the `python` directory.
+
 ## Components
+
+This section describes the main components of the CUDA simulation and how they interact.
 
 ### config.h
 
@@ -141,33 +183,3 @@ particles and are called from the main loop to draw particles each frame.
 4. **Interaction**:
    - Mouse input is processed by specific kernels in `kernels.cu` (push or swirl forces).
    - Boundary conditions prevent particles from leaving the domain.
-
-## Build and Run Instructions
-
-### Prerequisites
-
-- A CUDA-capable GPU with the NVIDIA driver installed.
-- NVIDIA CUDA Toolkit (tested with 12.8)
-- CMake (3.30 or higher)
-- Build tools (e.g., Visual Studio, GCC, etc.)
-
-### Steps
-
-1. Clone the repository and navigate into it.
-2. Create a build directory and run CMake:  
-   mkdir build && cd build  
-   cmake ..
-3. Build the project:  
-   cmake --build .
-4. Run the generated executable:  
-   .\Debug\SPH_CUDA
-
-## Future Improvements
-
-- **Performance Optimization**: Investigate better data structures or optimization techniques for neighbor searches.
-- **Extended Physics**: Add surface tension or more complex boundary conditions.
-- **Interactive UI**: Implement on-screen controls to change simulation parameters in real time.
-- **Multi-Platform Support**: Ensure compatibility with various operating systems and compilers.
-
-By focusing on modular design, this project demonstrates how to integrate CUDA-based physics with raylib for real-time
-rendering, allowing for a straightforward approach to exploring fluid dynamics through particle-based methods.
