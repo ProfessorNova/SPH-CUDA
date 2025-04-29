@@ -366,15 +366,3 @@ This work is mainly based on the following resources:
 - [Smoothed Particle Hydrodynamics Techniques for the Physics Based Simulation of Fluids and Solids](https://sph-tutorial.physics-simulation.org/pdf/SPH_Tutorial.pdf) by Dan Koschier, Jan Bender, Barbara Solenthaler, and Matthias Teschner.
 
 - [Particle Simulation using CUDA](https://web.archive.org/web/20140725014123/https://docs.nvidia.com/cuda/samples/5_Simulations/particles/doc/particles.pdf) by Simon Green.
-
-```
-
-```
-
-```
-
-```
-
-```
-
-```
