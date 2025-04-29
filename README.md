@@ -278,6 +278,7 @@ computePressure<<<blocks, threadsPerBlock>>>(particles, N, K, RHO0);
 CUDA offers Unified Memory so the runtime migrates data automatically between host and device memory. In this project, after launching a kernel, we synchronize to ensure all threads have completed before proceeding. This is done using `cudaDeviceSynchronize()`.
 
 ```cpp
+// main.cu
 computePressure<<<blocks, threadsPerBlock>>>(particles, N, K, RHO0);
 cudaDeviceSynchronize();
 ```
@@ -289,6 +290,7 @@ If not using unified memory, explicit memory management is required. This involv
 To compile device code separately and link automatically, we enable separable compilation in the CMakeLists.txt file. This allows each `.cu` file to be compiled into object code and linked into the final executable. This is done by adding the following lines to the CMakeLists.txt file:
 
 ```cmake
+# CMakeLists.txt
 set_target_properties(SPH_CUDA PROPERTIES
         CUDA_SEPARABLE_COMPILATION ON
 )
